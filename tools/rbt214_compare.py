@@ -70,7 +70,7 @@ def rbt214_compare(query: str) -> dict:
             by_cnas = [m for m in mappings if query in m["cnas_refs"]]
             if by_cnas:
                 results, matched_by = by_cnas, "cnas_ref"
-    if not results:
+    if not results and query:
         results = _search_by_keyword(query, mappings)
 
     output = {

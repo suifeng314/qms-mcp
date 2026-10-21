@@ -39,7 +39,8 @@ async def main() -> int:
             print(f"[OK] call_tool(query_clause, 7.4) -> {text[:80]}...")
 
             result = await session.call_tool("audit_checklist", {"area": "报告签发"})
-            assert "结果报告" in result.content[0].text
+            text = result.content[0].text
+            assert '"matched": true' in text and '"area": "结果报告"' in text
             print("[OK] call_tool(audit_checklist, 报告签发) alias resolved")
 
             result = await session.call_tool("rbt214_compare", {"query": "4.5.20"})

@@ -61,20 +61,21 @@ def query_clause(query: str) -> dict:
     results: list[dict] = []
     matched_by = "keyword"
 
-    id_match = _CLAUSE_ID_RE.match(query) or _CHAPTER_RE.match(query)
-    if id_match:
-        number = id_match.group(1)
-        exact = next((c for c in clauses if c["id"] == number), None)
-        if exact:
-            results = [exact]
-            matched_by = "clause_id"
-        else:  # 视为章节号，返回该章条款目录
-            chapter_clauses = [c for c in clauses if c["chapter"] == int(number)]
-            if chapter_clauses:
-                results = chapter_clauses
-                matched_by = "chapter"
-    if not results:
-        results = _search_by_keyword(query, clauses)
+    if query:
+        id_match = _CLAUSE_ID_RE.match(query) or _CHAPTER_RE.match(query)
+        if id_match:
+            number = id_match.group(1)
+            exact = next((c for c in clauses if c["id"] == number), None)
+            if exact:
+                results = [exact]
+                matched_by = "clause_id"
+            elif "." not in number:  # 纯整数视为章节号；带点号但未收录的条款号不按章节处理，避免 int() 崩溃
+                chapter_clauses = [c for c in clauses if c["chapter"] == int(number)]
+                if chapter_clauses:
+                    results = chapter_clauses
+                    matched_by = "chapter"
+        if not results:
+            results = _search_by_keyword(query, clauses)
 
     output = {
         "tool": "query_clause",

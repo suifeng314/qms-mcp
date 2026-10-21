@@ -19,7 +19,7 @@
 | `audit_checklist` | 审核领域（`设备管理`/`样品管理`/`结果报告` 等 13 个，支持简称） | 该领域内审检查要点清单（每领域 5-10 条） |
 | `rbt214_compare` | RB/T 214 章节号（`4.5`）、CNAS 条款号（`7.8`）或关键词（`换版`） | **废止状态警示（恒返回）** + 条款映射 + 差异要点 + 换版做法 |
 
-知识库覆盖 CNAS-CL01:2018 第 4-8 章 29 个主要条款 + 16 个关键子条款（6.2 人员族、7.2 方法族、7.7 质控、7.8 报告族八条、8.9 管理评审），以及 RB/T 214-2017（已废止）换版映射 17 条。
+知识库覆盖 CNAS-CL01:2018 第 4-8 章 29 个主要条款 + 17 个关键子条款（6.2 人员族、7.2 方法族、7.7 质控、7.8 报告族八条、8.9 管理评审三条），以及 RB/T 214-2017（已废止）换版映射 17 条。
 
 ## 安装
 
@@ -36,21 +36,21 @@ pip install mcp
 ### Claude Code
 
 ```bash
-claude mcp add qms-mcp -- python F:/BaiduSyncdisk/suifeng/qms-mcp/server.py
+claude mcp add qms-mcp -- python /path/to/qms-mcp/server.py
 ```
 
-（Windows 路径建议用正斜杠；也可用 `--scope user` 装为用户级。）
+（`/path/to/qms-mcp` 替换为你的本地克隆路径；Windows 路径建议用正斜杠；也可用 `--scope user` 装为用户级。）
 
 ### Claude Desktop
 
-编辑 `claude_desktop_config.json`：
+编辑 `claude_desktop_config.json`（路径同样替换为你的本地克隆路径）：
 
 ```json
 {
   "mcpServers": {
     "qms-mcp": {
       "command": "python",
-      "args": ["F:/BaiduSyncdisk/suifeng/qms-mcp/server.py"]
+      "args": ["/path/to/qms-mcp/server.py"]
     }
   }
 }
@@ -82,14 +82,17 @@ qms-mcp/
 │   ├── audit_checklist.py
 │   └── rbt214_compare.py
 ├── tests/
-│   ├── test_smoke.py      # 冒烟测试（19 项）
+│   ├── test_smoke.py      # 冒烟测试
 │   └── client_check.py    # 可选协议层验证
+├── .github/workflows/ci.yml  # push 即跑冒烟测试
+├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
 ## 自定义知识库
 
-直接编辑 `data/*.json` 即可，无需改代码：
+直接编辑 `data/*.json` 即可，无需改代码（注意：编辑后需重启 MCP 服务器/会话才生效——知识库按文件名缓存于进程内）：
 
 - `clauses.json` 每条含 `id / chapter / title / intent / points(2-4条) / keywords / record_fields / retention`（子条款紧随父条款存放）
 - `qms_knowledge.json` 含 `doc_guides`（四层文件指引）与 `audit_areas`（内审领域，每领域 5-10 条）
@@ -102,7 +105,7 @@ qms-mcp/
 
 ## 已知局限（v0.3 候选）
 
-- ~~条款粒度到 x.y 级~~ ✅ v0.2 已补 16 个关键子条款（6.2/7.2/7.7/7.8/8.9 族）；其余子条款按需增补
+- ~~条款粒度到 x.y 级~~ ✅ v0.2 已补关键子条款 17 条（6.2/7.2/7.7/7.8/8.9 族；v0.2.1 复核修正 8.9 族编号错位并补 8.9.1 总则）；其余子条款按需增补
 - ~~未覆盖 RB/T 214 差异对照~~ ✅ v0.2 已建换版映射（17 条，带废止警示）；RB/T 214 的 4.5 内部子条款编号未逐条核验，按主题级映射，仅 4.5.20（结果报告）编号经外部核验
 - 关键词检索为简单加权匹配，无同义词/拼音/语义扩展
 - 记录保存期限只有通用建议，未按行业/地区细分（危化、医疗、司法等有专门规定）

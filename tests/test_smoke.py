@@ -160,7 +160,7 @@ def test_subclauses_present():
         "7.2.1", "7.2.2",                     # 方法族
         "7.7.1",                              # 质控
         "7.8.1", "7.8.2", "7.8.3", "7.8.4", "7.8.5", "7.8.6", "7.8.7", "7.8.8",  # 报告族
-        "8.9.1", "8.9.2",                     # 管理评审
+        "8.9.1", "8.9.2", "8.9.3",            # 管理评审（总则/输入/输出）
     }
     assert expected <= ids, f"缺失子条款: {expected - ids}"
     # 父条款精确匹配不被子条款干扰
@@ -171,6 +171,26 @@ def test_subclauses_present():
     out = query_clause("7.8.6")
     assert out["matched_by"] == "clause_id"
     assert "符合性" in out["results"][0]["title"]
+
+
+def test_query_clause_numeric_unknown_no_crash():
+    """带点号但未收录的条款号不得崩溃（曾因 int() 抛 ValueError）。"""
+    for q in ("8.1", "9.9", "7.4.1", "4.3"):  # 8.1/4.3 为真实条款但库未收录
+        out = query_clause(q)
+        assert out["matched_by"] == "none", f"{q} 应走未命中分支"
+        assert out["all_clause_ids"], f"{q} 未命中时应给出可选条款号"
+
+
+def test_empty_query_no_fake_keyword_hit():
+    """空输入不得命中全部条目（"" in value 恒真陷阱）。"""
+    assert query_clause("")["matched_by"] == "none"
+    assert rbt214_compare("")["matched_by"] == "none"
+
+
+def test_query_clause_chapter_variants():
+    out = query_clause("第7章")
+    assert out["matched_by"] == "chapter"
+    assert len(out["results"]) >= 8
 
 
 # ---------- 知识库扩展：RB/T 214 换版对照 ----------
