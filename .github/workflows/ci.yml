@@ -13,6 +13,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      # 冒烟测试只依赖标准库（tools 不 import mcp），无需安装依赖
+      # 冒烟测试代码零第三方依赖（tools 不 import mcp），仅需 pytest 本体
+      - name: Install pytest
+        run: pip install pytest
       - name: Run smoke tests
         run: python -m pytest tests/test_smoke.py -v
