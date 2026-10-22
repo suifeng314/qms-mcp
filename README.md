@@ -75,7 +75,7 @@ qms-mcp/
 │   ├── qms_knowledge.json # 四层文件指引 + 内审领域检查要点（自写）
 │   └── rbt214_map.json    # RB/T 214-2017（已废止）↔ CL01 换版映射（自写）
 ├── tools/
-│   ├── _loader.py         # 知识库加载（UTF-8 + 缓存）
+│   ├── _loader.py         # 知识库加载（UTF-8 + mtime 热更新缓存）
 │   ├── query_clause.py
 │   ├── qms_doc_guide.py
 │   ├── derive_record_fields.py
@@ -92,7 +92,7 @@ qms-mcp/
 
 ## 自定义知识库
 
-直接编辑 `data/*.json` 即可，无需改代码（注意：编辑后需重启 MCP 服务器/会话才生效——知识库按文件名缓存于进程内）：
+直接编辑 `data/*.json` 即可，无需改代码、无需重启服务器（知识库按 mtime 热更新，保存文件后下次查询即生效）：
 
 - `clauses.json` 每条含 `id / chapter / title / intent / points(2-4条) / keywords / record_fields / retention`（子条款紧随父条款存放）
 - `qms_knowledge.json` 含 `doc_guides`（四层文件指引）与 `audit_areas`（内审领域，每领域 5-10 条）
