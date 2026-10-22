@@ -8,11 +8,15 @@ on:
 jobs:
   smoke:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
       # 冒烟测试代码零第三方依赖（tools 不 import mcp），仅需 pytest 本体
       - name: Install pytest
         run: pip install pytest
