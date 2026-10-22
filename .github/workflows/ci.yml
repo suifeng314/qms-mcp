@@ -13,12 +13,12 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       # 冒烟测试代码零第三方依赖（tools 不 import mcp），仅需 pytest 本体
       - name: Install pytest
         run: pip install pytest
-      - name: Run smoke tests
-        run: python -m pytest tests/test_smoke.py -v
+      - name: Run tests
+        run: python -m pytest tests/ -v
