@@ -175,10 +175,20 @@ def test_subclauses_present():
 
 def test_query_clause_numeric_unknown_no_crash():
     """带点号但未收录的条款号不得崩溃（曾因 int() 抛 ValueError）。"""
-    for q in ("8.1", "9.9", "7.4.1", "4.3"):  # 8.1/4.3 为真实条款但库未收录
+    for q in ("9.9", "4.3"):  # 4.3 在 CL01:2018 中不存在
         out = query_clause(q)
         assert out["matched_by"] == "none", f"{q} 应走未命中分支"
         assert out["all_clause_ids"], f"{q} 未命中时应给出可选条款号"
+
+
+def test_query_clause_formerly_uncovered_ids():
+    """扩库后原未收录的真实条款号（8.1/7.4.1）应转为精确命中。"""
+    for q in ("8.1", "7.4.1"):
+        out = query_clause(q)
+        assert out["matched_by"] == "clause_id", f"{q} 扩库后应精确命中"
+        assert out["results"][0]["clause_id"] == q
+        assert out["results"][0]["implementation_points"]
+        assert out["results"][0]["keywords"]
 
 
 def test_empty_query_no_fake_keyword_hit():
